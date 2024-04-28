@@ -1,0 +1,42 @@
+Line buffer kod geliştirmesi 
+Vivado Sürüm 2021.1 
+
+module bufferver3(
+input   i_clk,
+input   i_inp_rst,
+input [7:0] i_inp_data,
+input   i_inp_data_valid,
+output [23:0] o_out_data,
+input i_inp_read_data
+);
+
+reg [7:0] line [511:0]; //line buffer
+reg [8:0] wrPntr;
+reg [8:0] rdPntr;
+
+always @(posedge i_clk)
+begin
+    if(i_inp_data_valid)
+        line[wrPntr] <= i_inp_data;
+end
+
+always @(posedge i_clk)
+begin
+    if(i_inp_rst)
+        wrPntr <= 9'd0;
+    else if(i_inp_data_valid)
+        wrPntr <= wrPntr + 9'd1;
+end
+
+assign o_out_data = {line[rdPntr],line[rdPntr+1],line[rdPntr+2]};
+
+always @(posedge i_clk)
+begin
+    if(i_inp_rst)
+        rdPntr <= 9'd0;
+    else if(i_inp_read_data)
+        rdPntr <= rdPntr + 9'd1;
+end
+
+
+endmodule
